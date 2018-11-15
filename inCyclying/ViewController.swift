@@ -391,9 +391,9 @@ class ViewController: UIViewController {
     
     func endrun(){
         mapView.removeOverlays(mapView.overlays)
-        speedLabel.text = "0,00"
+        speedLabel.text = "0.00"
         timeLabel.text = "0:00"
-        distanceLabel.text = "0,00"
+        distanceLabel.text = "0.00"
         calorieLabel.text = "0"
         seconds = 0
         distance = 0.0
@@ -478,7 +478,7 @@ extension ViewController: CLLocationManagerDelegate {
 //
 //            }
     
-            speedLabel.text = String(format:"%.2f", speed)
+            speedLabel.text = String(format:"%.1f", speed)
         }
     }
 }
