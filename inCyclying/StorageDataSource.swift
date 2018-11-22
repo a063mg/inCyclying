@@ -12,7 +12,7 @@ import CoreData
 
 class StorageDataSource {
     
-    class func getDefaults(completion: @escaping (([[CLLocation]], Double, Int, Int, String, [Double]) -> Swift.Void)){
+    class func getDefaults(completion: @escaping (([[CLLocation]], Double, Int, Int, String, [Double], Double) -> Swift.Void)){
         
         var trip: [NSManagedObject] = []
         
@@ -30,6 +30,7 @@ class StorageDataSource {
         var distance: Double = 0.0
         var seconds: Int = 0
         var calories: Int = 0
+        var maxSpeed: Double = 0.0
         
         guard let appDelegate =
             UIApplication.shared.delegate as? AppDelegate else {
@@ -56,10 +57,11 @@ class StorageDataSource {
             calories = trip[0].value(forKey: "calories") as! Int
             run = trip[0].value(forKey: "run") as! String
             speedList = trip[0].value(forKey: "speedList") as! [Double]
+            maxSpeed = trip[0].value(forKey: "maxSpeed") as! Double
 
         }
         
-        completion(locationList, distance, seconds, calories, run, speedList)
+        completion(locationList, distance, seconds, calories, run, speedList, maxSpeed)
     
     }
     
@@ -79,7 +81,7 @@ class StorageDataSource {
 
     }
 
-    class func setDefaults(locationList: [[CLLocation]], run: String, seconds: Int, distance: Double, calories: Int, name: String, speedList: [Double]){
+    class func setDefaults(locationList: [[CLLocation]], run: String, seconds: Int, distance: Double, calories: Int, name: String, speedList: [Double], maxSpeed: Double){
 
         StorageDataSource.clearDefaults()
 
@@ -104,6 +106,8 @@ class StorageDataSource {
         trip.setValue(calories, forKeyPath: "calories")
         trip.setValue(name, forKeyPath: "name")
         trip.setValue(speedList, forKeyPath: "speedList")
+        trip.setValue(maxSpeed, forKeyPath: "maxSpeed")
+        
 
         do {
             try managedContext.save()
@@ -114,7 +118,7 @@ class StorageDataSource {
 
     }
     
-    class func saveTrip(locationList: [[CLLocation]], averageSpeed: Double, seconds: Int, distance: Double, calories: Int, date: Date, name: String){
+    class func saveTrip(locationList: [[CLLocation]], averageSpeed: Double, seconds: Int, distance: Double, calories: Int, date: Date, name: String, speedList: [Double], maxSpeed: Double){
         
         guard let appDelegate =
             UIApplication.shared.delegate as? AppDelegate else {
@@ -130,6 +134,7 @@ class StorageDataSource {
         let trip = NSManagedObject(entity: entity,
                                    insertInto: managedContext)
         
+        trip.setValue(speedList, forKeyPath: "speedList")
         trip.setValue(locationList, forKeyPath: "locationList")
         trip.setValue(averageSpeed, forKeyPath: "averageSpeed")
         trip.setValue(seconds, forKeyPath: "time")
@@ -137,6 +142,7 @@ class StorageDataSource {
         trip.setValue(calories, forKeyPath: "calories")
         trip.setValue(date, forKeyPath: "date")
         trip.setValue(name, forKeyPath: "name")
+        trip.setValue(maxSpeed, forKeyPath: "maxSpeed")
         
         do {
             try managedContext.save()
@@ -162,7 +168,7 @@ class StorageDataSource {
         }
     }
     
-    class func getAllTrips(completion: @escaping (([[[CLLocation]]], [Double], [Int], [Date], [Double], [Int], [String], Int) -> Swift.Void)){
+    class func getAllTrips(completion: @escaping (([[[CLLocation]]], [Double], [Int], [Date], [Double], [Int], [String], Int, [[Double]], [Double]) -> Swift.Void)){
         
         var locationList: [[[CLLocation]]] = []
         var distanceList: [Double] = []
@@ -171,6 +177,8 @@ class StorageDataSource {
         var averageSpeedList: [Double] = []
         var caloriesList: [Int] = []
         var nameList: [String] = []
+        var speedList: [[Double]] = []
+        var maxSpeedList: [Double] = []
         
         var trip: [NSManagedObject] = []
         
@@ -193,16 +201,81 @@ class StorageDataSource {
         
         if trip.count != 0{
             for i in 0...trip.count-1{
-                locationList.append(trip[i].value(forKey: "locationList") as! [[CLLocation]])
-                nameList.append(trip[i].value(forKey: "name") as! String)
-                distanceList.append(trip[i].value(forKey: "distance") as! Double)
-                secondsList.append(trip[i].value(forKey: "time") as! Int)
-                dateList.append(trip[i].value(forKey: "date") as! Date)
-                averageSpeedList.append(trip[i].value(forKey: "averageSpeed") as! Double)
-                caloriesList.append(trip[i].value(forKey: "calories") as! Int)
+                guard let locationListItem = trip[i].value(forKey: "locationList")
+                    else {
+                        print("nameList Error.")
+                        return
+                }
+                
+                locationList.append(locationListItem as! [[CLLocation]])
+                
+                guard let nameListItem = trip[i].value(forKey: "name")
+                    else {
+                        print("nameList Error.")
+                        return
+                }
+                
+                nameList.append(nameListItem as! String)
+                
+                guard let distanceListItem = trip[i].value(forKey: "distance")
+                    else {
+                        print("distanceList Error.")
+                        return
+                }
+                
+                distanceList.append(distanceListItem as! Double)
+                
+                guard let secondsListItem = trip[i].value(forKey: "time")
+                    else {
+                        print("secondsList Error.")
+                        return
+                }
+                
+                secondsList.append(secondsListItem as! Int)
+                
+                guard let dateListItem = trip[i].value(forKey: "date")
+                    else {
+                        print("dateList Error.")
+                        return
+                }
+                
+                dateList.append(dateListItem as! Date)
+                
+                guard let averageSpeedListItem = trip[i].value(forKey: "averageSpeed")
+                    else {
+                        print("averageSpeedList Error.")
+                        return
+                }
+                
+                averageSpeedList.append(averageSpeedListItem as! Double)
+                
+                guard let caloriesListItem = trip[i].value(forKey: "calories")
+                    else {
+                        print("caloriesList Error.")
+                        return
+                }
+                
+                caloriesList.append(caloriesListItem as! Int)
+                
+                guard let speedListItem = trip[i].value(forKey: "speedList")
+                    else {
+                        print("speedList Error.")
+                        return
+                }
+                
+                speedList.append(speedListItem as! [Double])
+                
+                guard let maxSpeedListItem = trip[i].value(forKey: "maxSpeed")
+                    else {
+                        print("maxSpeedList Error.")
+                        return
+                }
+                
+                maxSpeedList.append(maxSpeedListItem as! Double)
             }
         }
-        completion(locationList, distanceList, secondsList, dateList, averageSpeedList, caloriesList, nameList, trip.count)
+        
+        completion(locationList, distanceList, secondsList, dateList, averageSpeedList, caloriesList, nameList, trip.count, speedList, maxSpeedList)
     }
     
 }

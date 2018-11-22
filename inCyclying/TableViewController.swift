@@ -23,9 +23,12 @@ class TableViewController: UIViewController, UITableViewDataSource{
     var secondsList: [Int] = []
     var distanceList: [Double] = []
     var averageSpeedList: [Double] = []
+    var listOfSpeedList: [[Double]] = [[]]
     var caloriesList: [Int] = []
     var nameList: [String] = []
-    var speedList:[Double] = []
+    var maxSpeed: Double = 0.0
+    var maxSpeedList: [Double] = []
+    var speedList: [Double] = []
 
     @IBOutlet weak var tableView: UITableView!
     
@@ -44,7 +47,7 @@ class TableViewController: UIViewController, UITableViewDataSource{
         caloriesList = []
         nameList = []
 
-        StorageDataSource.getAllTrips(){ (locationList, distanceList, secondsList, dateList, averageSpeedList, caloriesList, nameList, rows) in
+        StorageDataSource.getAllTrips(){ (locationList, distanceList, secondsList, dateList, averageSpeedList, caloriesList, nameList, rows, listOfSpeedList, maxSpeedList) in
             self.locationList = locationList
             self.distanceList = distanceList
             self.secondsList = secondsList
@@ -53,6 +56,8 @@ class TableViewController: UIViewController, UITableViewDataSource{
             self.caloriesList = caloriesList
             self.nameList = nameList
             self.rows = rows
+            self.maxSpeedList = maxSpeedList
+            self.listOfSpeedList = listOfSpeedList
         }
         self.tableView.dataSource = self
         self.tableView.reloadData()
@@ -84,7 +89,7 @@ class TableViewController: UIViewController, UITableViewDataSource{
             
             cell.Title.text = String(formatter.string(from: TimeInterval(secondsList[indexPath.row]))!)
             cell.subTitle.text = String(distanceList[indexPath.row]) + " km"
-            
+            cell.name.text = nameList[indexPath.row]
             let formatterDate = DateFormatter()
             formatterDate.dateFormat = "dd.MM.yyyy"
             
@@ -126,7 +131,8 @@ class TableViewController: UIViewController, UITableViewDataSource{
                 destination.name = nameList[indexPath.row]
                 destination.averageSpeed = averageSpeedList[indexPath.row]
                 destination.calories = caloriesList[indexPath.row]
-                destination.speedList = []
+                destination.speedList = listOfSpeedList[indexPath.row]
+                destination.maxSpeed = maxSpeedList[indexPath.row]
             }
         }
     }

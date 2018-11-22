@@ -47,7 +47,8 @@ class ViewController: UIViewController {
     var name: String = "New Trip"
     var date: Date = Date()
     var extr: Double = 0
-    var last: CGFloat = 0
+    var last: Double = 0.0
+    
     
     let screenSize: CGRect = UIScreen.main.bounds
     let fontName = "SFProDisplay-Thin"
@@ -62,13 +63,15 @@ class ViewController: UIViewController {
     @IBOutlet weak var nameButton: UIButton!
     
     override func viewWillAppear(_ animated: Bool) {
-        StorageDataSource.getDefaults(){ (locationList,distance, seconds, calories,run, speedList) in
+        StorageDataSource.getDefaults(){ (locationList,distance, seconds, calories,run, speedList,maxSpeed) in
             //print(locationList,distance,seconds, calories,run)
+            self.speedList = speedList
             self.locationList = locationList
             self.distance = distance
             self.seconds = seconds
             self.calories = Double(calories)
             self.speedList = speedList
+            self.maxSpeed = maxSpeed
             if self.string2Run(run: run) == .load{
                 self.updateButtons()
                 self.loadMap(locations: locationList)
@@ -116,13 +119,14 @@ class ViewController: UIViewController {
             mapView.setRegion(viewRegion, animated: true)
         }
         
-        StorageDataSource.getDefaults(){ (locationList,distance, seconds, calories,run,speedList) in
+        StorageDataSource.getDefaults(){ (locationList,distance, seconds, calories,run,speedList,maxSpeed) in
             //print(locationList,distance,seconds, calories,run)
             self.locationList = locationList
             self.distance = distance
             self.seconds = seconds
             self.calories = Double(calories)
             self.speedList = speedList
+            self.maxSpeed = maxSpeed
             if self.string2Run(run: run) != .load{
                 self.run = .stop
                 self.buttonType = .paused
@@ -273,7 +277,7 @@ class ViewController: UIViewController {
             seconds += 1
             averageSpeed = Double(round(100*3600*(distance/Double(seconds)))/100)
             calories = (weight * averageSpeed * Double(seconds/60) * 3.0)/400
-            calorieLabel.text = String(format: "%.0f", calories)
+//            calorieLabel.text = String(format: "%.0f", calories)
             
             let formatter = DateComponentsFormatter()
             if seconds >= 3600{
@@ -290,7 +294,7 @@ class ViewController: UIViewController {
     }
     
     func saveData(){
-        StorageDataSource.setDefaults(locationList: locationList, run: run2String(run: run), seconds: seconds, distance: Double(round(100*distance)/100), calories: Int(calories), name: name, speedList: speedList)
+        StorageDataSource.setDefaults(locationList: locationList, run: run2String(run: run), seconds: seconds, distance: Double(round(100*distance)/100), calories: Int(calories), name: name, speedList: speedList, maxSpeed: maxSpeed)
     }
     
     func startLocationUpdates() {
@@ -378,8 +382,11 @@ class ViewController: UIViewController {
                                                 preferredStyle: .actionSheet)
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alertController.addAction(UIAlertAction(title: "Save", style: .default) { _ in
-            StorageDataSource.saveTrip(locationList: self.locationList, averageSpeed: self.averageSpeed, seconds: self.seconds, distance: Double(round(100*self.distance)/100), calories: Int(self.calories), date: self.date, name: self.name)
+            self.speedList.append(self.speed)
+            
+            StorageDataSource.saveTrip(locationList: self.locationList, averageSpeed: self.averageSpeed, seconds: self.seconds, distance: Double(round(100*self.distance)/100), calories: Int(self.calories), date: self.date, name: self.name, speedList: self.speedList, maxSpeed: self.maxSpeed)
             self.endrun()
+            
         })
         alertController.addAction(UIAlertAction(title: "Discard", style: .destructive) { _ in
             self.endrun()
@@ -429,6 +436,7 @@ extension ViewController: CLLocationManagerDelegate {
             
             if let lastLocation = locationList.last!.last {
                 let delta = newLocation.distance(from: lastLocation)
+                calorieLabel.text = String(newLocation.altitude)
                 distance = distance + delta/1000
                 distanceLabel.text  =  String(format: "%.2f", Double(round(100*distance)/100))
                 let coordinates = [lastLocation.coordinate, newLocation.coordinate]
@@ -457,29 +465,27 @@ extension ViewController: CLLocationManagerDelegate {
                 speedList = [0]
             }
             
-            speedList.append(Double(round(10*speed)/10))
-            
 //            deltaT = 0
-//            if speed != 0 {
-                
-//                if last > CGFloat(round(10*speed)/10){
-//                    if extr == -1{
-//                        speedList.append(CGFloat(round(10*speed)/10))
-//                    }
-//                    extr = 1
-//                }
-//                else{
-//                    if extr == 1{
-//                        speedList.append(CGFloat(round(10*speed)/10))
-//                    }
-//                    extr = -1
-//                }
-//                last = CGFloat(round(10*speed)/10)
-//
-//            }
+            
+                if last > Double(round(10*speed)/10) + 1{
+                    if extr == -1{
+                        speedList.append(Double(round(10*speed)/10))
+                    }
+                    extr = 1
+                }
+                else{
+                    if extr == 1 && last < Double(round(10*speed)/10) - 1{
+                        if speed != 0.0{
+                            speedList.append(Double(round(10*speed)/10))
+                        }
+                    }
+                    extr = -1
+                }
+                last = Double(round(10*speed)/10)
+
+            }
     
             speedLabel.text = String(format:"%.2f", speed)
-        }
     }
 }
 

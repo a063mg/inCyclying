@@ -458,7 +458,7 @@
                                 <rect key="frame" x="0.0" y="88" width="375" height="862"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KFM-mw-Cu9">
-                                        <rect key="frame" x="0.0" y="0.0" width="375" height="165"/>
+                                        <rect key="frame" x="0.0" y="25" width="375" height="165"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" alignment="top" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="SCM-Lk-Q6q">
                                                 <rect key="frame" x="156" y="8" width="219" height="141"/>
@@ -583,21 +583,32 @@
                                         </constraints>
                                     </view>
                                     <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="Eus-bs-lqJ">
-                                        <rect key="frame" x="0.0" y="181" width="375" height="241"/>
+                                        <rect key="frame" x="0.0" y="215" width="375" height="241"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="241" id="RDO-Z6-mwV"/>
                                         </constraints>
                                     </mapView>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dL5-UC-su5" customClass="LineChartView" customModule="Charts">
+                                        <rect key="frame" x="0.0" y="481" width="375" height="300"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="300" id="4gj-XM-lXy"/>
+                                            <constraint firstAttribute="width" constant="375" id="e5r-UH-Tpm"/>
+                                        </constraints>
+                                    </view>
                                 </subviews>
+                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <constraints>
                                     <constraint firstItem="Eus-bs-lqJ" firstAttribute="leading" secondItem="W3z-TQ-xQZ" secondAttribute="leading" id="3fd-A1-Lid"/>
-                                    <constraint firstItem="KFM-mw-Cu9" firstAttribute="top" secondItem="W3z-TQ-xQZ" secondAttribute="top" id="Ky3-R5-kdJ"/>
-                                    <constraint firstAttribute="bottom" secondItem="Eus-bs-lqJ" secondAttribute="bottom" constant="440" id="Pge-4L-GHS"/>
+                                    <constraint firstItem="dL5-UC-su5" firstAttribute="top" secondItem="Eus-bs-lqJ" secondAttribute="bottom" constant="25" id="Fae-G0-SGq"/>
+                                    <constraint firstItem="KFM-mw-Cu9" firstAttribute="top" secondItem="W3z-TQ-xQZ" secondAttribute="top" constant="25" id="Ky3-R5-kdJ"/>
                                     <constraint firstAttribute="trailing" secondItem="KFM-mw-Cu9" secondAttribute="trailing" id="VDa-oz-9sh"/>
-                                    <constraint firstItem="Eus-bs-lqJ" firstAttribute="top" secondItem="KFM-mw-Cu9" secondAttribute="bottom" constant="16" id="YdY-1B-EIx"/>
+                                    <constraint firstItem="Eus-bs-lqJ" firstAttribute="top" secondItem="KFM-mw-Cu9" secondAttribute="bottom" constant="25" id="YdY-1B-EIx"/>
+                                    <constraint firstAttribute="trailing" secondItem="dL5-UC-su5" secondAttribute="trailing" id="d19-ff-p85"/>
+                                    <constraint firstItem="dL5-UC-su5" firstAttribute="leading" secondItem="W3z-TQ-xQZ" secondAttribute="leading" id="ees-cG-PeM"/>
                                     <constraint firstAttribute="trailing" secondItem="Eus-bs-lqJ" secondAttribute="trailing" id="hMR-8b-dTP"/>
                                     <constraint firstItem="KFM-mw-Cu9" firstAttribute="leading" secondItem="W3z-TQ-xQZ" secondAttribute="leading" id="hem-IJ-pe1"/>
-                                    <constraint firstItem="Eus-bs-lqJ" firstAttribute="top" secondItem="KFM-mw-Cu9" secondAttribute="bottom" constant="16" id="wDl-A8-4AF"/>
+                                    <constraint firstAttribute="bottom" secondItem="dL5-UC-su5" secondAttribute="bottom" constant="81" id="qeD-u8-8DW"/>
                                 </constraints>
                             </scrollView>
                         </subviews>
@@ -628,6 +639,7 @@
                         <outlet property="averageSpeedLabel" destination="AvY-EQ-s93" id="YhN-fX-t7h"/>
                         <outlet property="caloriesLabel" destination="t8c-RH-6iC" id="RRj-Gt-FJQ"/>
                         <outlet property="distanceLabel" destination="Izl-R0-sDC" id="DGb-nT-7oP"/>
+                        <outlet property="lineChart" destination="dL5-UC-su5" id="bMR-Vz-aCK"/>
                         <outlet property="mapView" destination="Eus-bs-lqJ" id="WEJ-8E-IZM"/>
                         <outlet property="nameLabel" destination="feb-WR-2XL" id="UYf-y2-WLR"/>
                         <outlet property="rideTimeLabel" destination="k2S-DV-Qi0" id="81R-z6-Afa"/>
@@ -636,7 +648,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="prD-vL-gRk" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="8143" y="-776"/>
+            <point key="canvasLocation" x="8141.6000000000004" y="-776.23152709359613"/>
         </scene>
         <!--Full Map View Controller-->
         <scene sceneID="woZ-UC-YCT">

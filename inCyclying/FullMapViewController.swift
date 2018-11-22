@@ -26,7 +26,7 @@ class FullMapViewController: UIViewController, MKMapViewDelegate, CLLocationMana
         mapView.removeOverlays(mapView.overlays)
         locationList = [[]]
         
-        StorageDataSource.getDefaults(){ (locationList,distance, seconds, calories,run, speedList) in
+        StorageDataSource.getDefaults(){ (locationList,distance, seconds, calories,run, speedList, maxSpeed) in
             self.locationList = locationList
             print(run)
             if run == "load"{

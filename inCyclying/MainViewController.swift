@@ -23,7 +23,20 @@ class MainViewController: UIViewController{
         chartDataSet.lineWidth = 2
         let chartData = LineChartData(dataSet: chartDataSet)
         chartData.setDrawValues(false)
+       
+        let gradientColors = [UIColor.red.cgColor, UIColor.clear.cgColor] as CFArray
+        let colorLocations: [CGFloat] = [1.0,0.0]
+        guard let gradient = CGGradient.init(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: gradientColors, locations: colorLocations)
+            else {
+            print("gradient error.")
+            return
+        }
+        
+        chartDataSet.fill = Fill.fillWithLinearGradient(gradient, angle: 90)
+        chartDataSet.drawFilledEnabled = true
+        
         barChartView.data = chartData
+        
         barChartView.pinchZoomEnabled = false
         barChartView.doubleTapToZoomEnabled = false
         barChartView.highlightPerTapEnabled = false
@@ -34,14 +47,24 @@ class MainViewController: UIViewController{
         barChartView.rightAxis.drawGridLinesEnabled = false
         barChartView.rightAxis.enabled = false
         barChartView.leftAxis.drawLabelsEnabled = true
+        
     }
     
     override func viewDidLoad() {
         
-        StorageDataSource.getDefaults(){ (locationList,distance, seconds, calories,run, speedList) in
+        StorageDataSource.getDefaults(){ (locationList,distance, seconds, calories,run, speedList, maxSpeed) in
             self.speedList = speedList
         }
-        
+
+        setChart(values: speedList)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        StorageDataSource.getDefaults(){ (locationList,distance, seconds, calories,run, speedList,maxSpeed) in
+            self.speedList = speedList
+        }
+
+
         setChart(values: speedList)
     }
 

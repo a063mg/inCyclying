@@ -9,6 +9,8 @@
 import UIKit
 import MapKit
 import CoreData
+import Charts
+
 
 class DetailedViewController: UIViewController, MKMapViewDelegate {
     
@@ -20,6 +22,8 @@ class DetailedViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var caloriesLabel: UILabel!
     
     @IBOutlet weak var mapView: MKMapView!
+    
+    @IBOutlet weak var lineChart: LineChartView!
     
     enum Run{
         case start
@@ -40,6 +44,7 @@ class DetailedViewController: UIViewController, MKMapViewDelegate {
     var speedList: [Double] = []
     var trip: [NSManagedObject] = []
     var avaliable: Bool = true
+    var maxSpeed: Double = 0.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,8 +61,9 @@ class DetailedViewController: UIViewController, MKMapViewDelegate {
         distanceLabel.text = String(distance) + " km"
         averageSpeedLabel.text = String(averageSpeed) + " km/h"
         caloriesLabel.text = String(calories) + " cl"
-        
+        print(speedList)
         loadMap()
+        setChart(values: speedList)
         
         showTrip(locationList: locationList)
         
@@ -121,11 +127,11 @@ class DetailedViewController: UIViewController, MKMapViewDelegate {
     }
     
     @IBAction func loadTrip(_ sender: Any) {
-        StorageDataSource.getDefaults(){ (locationList,distance, seconds, calories,run,speedList) in
+        StorageDataSource.getDefaults(){ (locationList,distance, seconds, calories,run,speedList,maxSpeed) in
                 self.run = self.string2Run(run: run)
         }
         if run == .finish {
-            StorageDataSource.setDefaults(locationList: locationList, run: "load", seconds: seconds, distance: Double(round(100*distance)/100), calories: Int(calories), name: name, speedList: speedList)
+            StorageDataSource.setDefaults(locationList: locationList, run: "load", seconds: seconds, distance: Double(round(100*distance)/100), calories: Int(calories), name: name, speedList: speedList, maxSpeed: maxSpeed)
             showHomeController()
         }
         else{
@@ -144,6 +150,49 @@ class DetailedViewController: UIViewController, MKMapViewDelegate {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         //show window
         appDelegate.window?.rootViewController = view
+    }
+    
+    func setChart(values: [Double]) {
+        lineChart.noDataText = "You need to provide data for the chart."
+        var dataEntries: [ChartDataEntry] = []
+        
+        for i in 0..<values.count {
+            let dataEntry = ChartDataEntry(x: Double(i), y: Double(values[i]))
+            dataEntries.append(dataEntry)
+        }
+        
+        let chartDataSet = LineChartDataSet(values: dataEntries, label: "Units Sold")
+        chartDataSet.mode = .cubicBezier
+        chartDataSet.cubicIntensity = 0.2
+        chartDataSet.drawCirclesEnabled = false
+        chartDataSet.colors = [UIColor.red]
+        chartDataSet.lineWidth = 2
+        let chartData = LineChartData(dataSet: chartDataSet)
+        chartData.setDrawValues(false)
+        
+        let gradientColors = [UIColor.red.cgColor, UIColor.clear.cgColor] as CFArray
+        let colorLocations: [CGFloat] = [1.0,0.0]
+        guard let gradient = CGGradient.init(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: gradientColors, locations: colorLocations)
+            else {
+                print("gradient error.")
+                return
+        }
+        
+        chartDataSet.fill = Fill.fillWithLinearGradient(gradient, angle: 90)
+        chartDataSet.drawFilledEnabled = true
+        
+        lineChart.data = chartData
+        lineChart.backgroundColor = UIColor.white
+        lineChart.doubleTapToZoomEnabled = false
+        lineChart.highlightPerTapEnabled = false
+        lineChart.leftAxis.axisMinimum = 0
+        lineChart.highlightPerDragEnabled = false
+        lineChart.xAxis.labelPosition = .bottom
+        lineChart.xAxis.drawGridLinesEnabled = false
+        lineChart.rightAxis.drawGridLinesEnabled = false
+        lineChart.rightAxis.enabled = false
+        lineChart.leftAxis.drawLabelsEnabled = true
+        
     }
     
     func polyLine(Location: [CLLocation]) -> MKPolyline {
