@@ -485,14 +485,13 @@ extension ViewController: CLLocationManagerDelegate {
 
             }
     
-<<<<<<< HEAD
             speedLabel.text = String(format:"%.2f", speed)
-=======
+
             speedLabel.text = String(format:"%.1f", speed)
         }
->>>>>>> 11a257f206f6fc5da0f7ab50d78f34e36e35ab9a
+
     }
-}
+
 
 // MARK: - Map View Delegate
 
